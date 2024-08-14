@@ -1,0 +1,19 @@
+GET http://localhost:3001/api/persons
+
+###
+
+GET http://localhost:3001/info
+
+###
+
+DELETE http://localhost:3001/api/person/1
+
+###
+
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "John Cena",
+  "number": "123-490-2756"
+}
