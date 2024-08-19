@@ -1,3 +1,4 @@
+const { Db } = require("mongodb");
 const mongoose = require("mongoose");
 
 if (process.argv.length < 3) {
@@ -6,6 +7,8 @@ if (process.argv.length < 3) {
 }
 
 const password = process.argv[2];
+const name = process.argv[3];
+const number = process.argv[4];
 
 const url = `mongodb+srv://oceansf:${password}@cluster0.3gd3r.mongodb.net/phonebookApp?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -16,7 +19,7 @@ mongoose.connect(url);
 
 // Define schema
 const personSchema = new mongoose.Schema({
-  id: String,
+  id: Number,
   name: String,
   number: String,
 });
@@ -25,20 +28,22 @@ const Person = mongoose.model("Person", personSchema);
 
 // Create new person object
 const person = new Person({
-  id: "1",
-  name: "Arto Hellas",
-  number: "040-123456",
+  name,
+  number,
 });
 
-// Add predefined person above to collection
-person.save().then((result) => {
-  console.log("note saved!");
-});
-
-// Prints out each person in collection
-Person.find({}).then((result) => {
-  result.forEach((person) => {
-    console.log(person);
+if (!name || !number) {
+  // Prints out each person's name and number in collection
+  Person.find({}).then((result) => {
+    result.forEach((person) => {
+      console.log(`${person.name} ${person.number}`);
+    });
+    mongoose.connection.close();
   });
-  mongoose.connection.close();
-});
+} else {
+  // Add predefined person above to collection
+  person.save().then((result) => {
+    console.log(`added ${name} number ${number} to phonebook`);
+    mongoose.connection.close();
+  });
+}
