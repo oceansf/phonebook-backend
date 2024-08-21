@@ -60,31 +60,35 @@ app.get("/api/persons", (request, response) => {
 //   }
 // };
 
-// app.post("/api/persons", (request, response) => {
-//   const body = request.body;
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+  // Check for missing fields or already added person
+  // if (!body.name || !body.number) {
+  //   return response.status(400).json({
+  //     error: "name or number missing",
+  //   });
+  // } else if (checkIfExists(body.name, body.number)) {
+  //   return response.status(400).json({
+  //     error: "name or number already exists",
+  //   });
+  // } else {
+  //   const person = {
+  //     id: generateId(),
+  //     name: body.name,
+  //     number: body.number,
+  //   };
 
-//   if (!body.name || !body.number) {
-//     return response.status(400).json({
-//       error: "name or number missing",
-//     });
-//   } else if (checkIfExists(body.name, body.number)) {
-//     return response.status(400).json({
-//       error: "name or number already exists",
-//     });
-//   } else {
-//     const person = {
-//       id: generateId(),
-//       name: body.name,
-//       number: body.number,
-//     };
+  // Create a new person
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  });
 
-//     persons = persons.concat(person);
-
-//     response.json(person);
-//   }
-// });
-
-// app.use(unknownEndpoint);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
+  // }
+});
 
 const PORT = 3001;
 app.listen(PORT, () => {
