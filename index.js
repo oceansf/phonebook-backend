@@ -3,105 +3,86 @@ const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
 
+const Person = require("./mongo");
+
 app.use(cors());
 app.use(express.json());
-
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
 
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms")
 );
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
-
-app.get("/info", (request, response) => {
-  response.send(
-    `<p>Phonebook has info for ${
-      persons.length
-    } people<br/>${new Date().toString()}</p>`
-  );
-});
-
-app.get("/api/person/:id", (request, response) => {
-  const person = persons.find((person) => person.id === request.params.id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
-});
-
-app.delete("/api/person/:id", (request, response) => {
-  persons.filter((person) => {
-    person.id === request.params.id;
+  Person.find({}).then((people) => {
+    response.json(people);
   });
-
-  response.json(204);
 });
 
-const generateId = () => {
-  const maxId =
-    persons.length > 0 ? Math.max(...persons.map((p) => Number(p.id))) : 0;
-  return String(maxId + 1);
-};
+// app.get("/info", (request, response) => {
+//   response.send(
+//     `<p>Phonebook has info for ${
+//       persons.length
+//     } people<br/>${new Date().toString()}</p>`
+//   );
+// });
 
-const checkIfExists = (name, number) => {
-  const names = persons.map((person) => person.name);
-  const numbers = persons.map((person) => person.number);
+// app.get("/api/person/:id", (request, response) => {
+//   const person = persons.find((person) => person.id === request.params.id);
+//   if (person) {
+//     response.json(person);
+//   } else {
+//     response.status(404).end();
+//   }
+// });
 
-  if (names.includes(name) || numbers.includes(number)) {
-    return true;
-  } else {
-    return false;
-  }
-};
+// app.delete("/api/person/:id", (request, response) => {
+//   persons.filter((person) => {
+//     person.id === request.params.id;
+//   });
 
-app.post("/api/persons", (request, response) => {
-  const body = request.body;
+//   response.json(204);
+// });
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({
-      error: "name or number missing",
-    });
-  } else if (checkIfExists(body.name, body.number)) {
-    return response.status(400).json({
-      error: "name or number already exists",
-    });
-  } else {
-    const person = {
-      id: generateId(),
-      name: body.name,
-      number: body.number,
-    };
+// const generateId = () => {
+//   const maxId =
+//     persons.length > 0 ? Math.max(...persons.map((p) => Number(p.id))) : 0;
+//   return String(maxId + 1);
+// };
 
-    persons = persons.concat(person);
+// const checkIfExists = (name, number) => {
+//   const names = persons.map((person) => person.name);
+//   const numbers = persons.map((person) => person.number);
 
-    response.json(person);
-  }
-});
+//   if (names.includes(name) || numbers.includes(number)) {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
+
+// app.post("/api/persons", (request, response) => {
+//   const body = request.body;
+
+//   if (!body.name || !body.number) {
+//     return response.status(400).json({
+//       error: "name or number missing",
+//     });
+//   } else if (checkIfExists(body.name, body.number)) {
+//     return response.status(400).json({
+//       error: "name or number already exists",
+//     });
+//   } else {
+//     const person = {
+//       id: generateId(),
+//       name: body.name,
+//       number: body.number,
+//     };
+
+//     persons = persons.concat(person);
+
+//     response.json(person);
+//   }
+// });
 
 // app.use(unknownEndpoint);
 
